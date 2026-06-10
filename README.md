@@ -2,7 +2,12 @@
 
 > 用毛主席《矛盾论》《实践论》分析算法问题
 
-**[🔗 在线体验](https://llyhy.github.io/redbook/chat/)** ｜ [📋 复制系统提示词](https://github.com/LLyhy/redbook/blob/main/finetune/REDBOOK_SHORT.md) ｜ [📊 下载训练数据](https://github.com/LLyhy/redbook/blob/main/finetune/training_data.jsonl)
+**[🔗 免 Key 体验](https://llyhy.github.io/redbook/demo/)** ｜ [💬 在线聊天](https://llyhy.github.io/redbook/chat/) ｜ [📋 系统提示词](https://github.com/LLyhy/redbook/blob/main/finetune/REDBOOK_SHORT.md) ｜ [📊 训练数据](https://github.com/LLyhy/redbook/blob/main/finetune/training_data.jsonl)
+
+[![评测](https://img.shields.io/badge/评测-10:0_完胜原生_DeepSeek-c41e3a)](https://github.com/LLyhy/redbook/blob/main/EVAL_REPORT.md)
+[![提示词](https://img.shields.io/badge/提示词-300_tokens-ff6b81)](https://github.com/LLyhy/redbook/blob/main/finetune/REDBOOK_SHORT.md)
+[![训练数据](https://img.shields.io/badge/训练数据-1000_条_JSONL-ff9800)](https://github.com/LLyhy/redbook/blob/main/finetune/training_data.jsonl)
+[![版本](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/LLyhy/redbook/releases)
 
 ---
 
