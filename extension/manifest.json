@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "红宝书 · LeetCode 助手",
+  "version": "1.0",
+  "description": "用矛盾分析法分析力扣题目",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://leetcode.cn/problems/*",
+    "https://leetcode.com/problems/*",
+    "https://api.deepseek.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "红宝书"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://leetcode.cn/problems/*",
+        "https://leetcode.com/problems/*"
+      ],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
