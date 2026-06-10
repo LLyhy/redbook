@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>红宝书 · 即时 Demo</title>
+<style>
+:root{--bg:#0d0d0d;--card:#161616;--red:#c41e3a;--text:#e8e6e3;--muted:#a0a0a0;--border:#2a2a2a;--accent:#ff6b81}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;position:relative;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:url(../bg.jpg) center/cover no-repeat;opacity:0.12;z-index:0;pointer-events:none}
+.header{position:relative;z-index:1;text-align:center;padding:40px 20px 20px}
+.header h1{font-size:2.5em;font-weight:800;letter-spacing:-1px}
+.header h1 .red{color:var(--red)}
+.header .sub{color:var(--muted);margin-top:8px;font-size:1em}
+.header .badge{display:inline-block;margin-top:12px;background:var(--red);color:#fff;padding:4px 14px;border-radius:20px;font-size:0.8em;font-weight:600}
+.container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 20px 60px}
+.qa-grid{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.qa-btn{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;color:var(--text);font-size:0.95em;text-align:left;cursor:pointer;transition:all 180ms ease;display:flex;align-items:center;gap:12px}
+.qa-btn:hover{border-color:var(--red);transform:translateX(4px)}
+.qa-btn:active{background:#1a1a1a}
+.qa-btn .idx{color:var(--red);font-weight:700;font-size:1.1em;min-width:28px}
+.qa-btn .difficulty{font-size:0.75em;padding:2px 8px;border-radius:10px;margin-left:auto;flex-shrink:0}
+.qa-btn .diff-easy{background:rgba(76,175,80,0.15);color:#4caf50}
+.qa-btn .diff-medium{background:rgba(255,152,0,0.15);color:#ff9800}
+.qa-btn .diff-hard{background:rgba(244,67,54,0.15);color:#f44336}
+.answer-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:24px;overflow:hidden;display:none}
+.answer-panel.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.answer-header{background:rgba(196,30,58,0.08);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:10px}
+.answer-header .qtitle{font-weight:600;font-size:1.05em}
+.answer-body{padding:20px;font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:0.84em;line-height:1.9;overflow-x:auto}
+.answer-body .tag{color:var(--red);font-weight:700}
+.answer-body .code-block{display:block;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:14px;margin:10px 0;color:#a5d6ff}
+.footer{position:relative;z-index:1;text-align:center;padding:40px 20px;color:var(--muted);font-size:0.85em;border-top:1px solid var(--border);margin-top:40px}
+.footer a{color:var(--red);text-decoration:none}
+@media(max-width:640px){.header h1{font-size:1.8em}.qa-btn{font-size:0.88em;padding:12px 14px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span class="red">红</span>宝书 · 即时 Demo</h1>
+  <p class="sub">无需 API Key，点击问题即可查看完整分析</p>
+  <span class="badge">10 道经典算法题</span>
+</div>
+
+<div class="container">
+  <div class="qa-grid" id="qaGrid"></div>
+  <div class="answer-panel" id="answerPanel">
+    <div class="answer-header"><span id="answerIcon">🧠</span><span class="qtitle" id="answerTitle"></span></div>
+    <div class="answer-body" id="answerBody"></div>
+  </div>
+</div>
+
+<div class="footer">
+  红宝书 · <a href="https://github.com/LLyhy/redbook">GitHub</a> · <a href="./">着陆页</a> · <a href="chat/">在线聊天</a>
+</div>
+
+<script>
+const QA_DATA = [
+  {title:"两数之和",diff:"easy",icon:"🟢",q:"给定整数数组 nums 和目标值 target，找出和为 target 的两个数的下标",
+   a:`<span class="tag">【调查】</span>输入整数数组 nums，目标值 target。输出两个下标使对应元素和等于 target。约束：有唯一解，不能重复使用。
+<span class="tag">【主要矛盾】</span>暴力 O(n²) 枚举每对组合。查找补数 target-num 太慢——真正矛盾是「查找补数」。
+<span class="tag">【解法】</span>群众路线——哈希表。遍历时检查 target-num 是否已存在。O(n)。<span class="code-block">def two_sum(nums, target):
+    seen = {}
+    for i, n in enumerate(nums):
+        if target - n in seen:
+            return [seen[target - n], i]
+        seen[n] = i</span>
+<span class="tag">【检验】</span>时间 O(n)，空间 O(n)。全是负数 / 重复元素均正确。通过。`},
+
+  {title:"有效括号",diff:"easy",icon:"🟢",q:"给定只包含 ()[]{} 的字符串，判断是否有效配对",
+   a:`<span class="tag">【调查】</span>输入括号字符串 s。输出布尔值，表示是否有效。约束：必须正确配对且左括号先出现。
+<span class="tag">【主要矛盾】</span>后遇到的左括号要优先闭合——LIFO 特性，这就是栈。
+<span class="tag">【解法】</span>栈遇左括号压入，遇右括号弹栈匹配。遍历完栈空即为有效。O(n)。<span class="code-block">def is_valid(s):
+    stack = []
+    pairs = {')': '(', ']': '[', '}': '{'}
+    for ch in s:
+        if ch in '([{':
+            stack.append(ch)
+        elif not stack or stack.pop() != pairs[ch]:
+            return False
+    return not stack</span>
+<span class="tag">【检验】</span>空串、单括号、嵌套、交错。O(n) O(n)。通过。`},
+
+  {title:"反转链表",diff:"easy",icon:"🟢",q:"反转一个单链表",
+   a:`<span class="tag">【调查】</span>输入链表头节点 head。输出反转后的新头节点。约束：原地操作，不能新建节点。
+<span class="tag">【主要矛盾】</span>改一个指针，后面的路就断了——牵一发动全身。需要先保存 next 再改指针。
+<span class="tag">【解法】</span>三指针：prev, curr, next。每次让 curr 指向 prev，再三人同步后移。O(n)<span class="code-block">def reverse_list(head):
+    prev, curr = None, head
+    while curr:
+        nxt = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nxt
+    return prev</span>
+<span class="tag">【检验】</span>空链表、单节点、多节点。O(n) O(1)。通过。`},
+
+  {title:"最大子数组和",diff:"medium",icon:"🟡",q:"给定整数数组，找出连续子数组的最大和",
+   a:`<span class="tag">【调查】</span>输入整数数组 nums。输出一个整数——所有连续子数组的最大和。约束：至少一个元素。
+<span class="tag">【主要矛盾】</span>全负数时每个元素单独更好，正数时累加更好。「继续加」与「重新开始」之间的矛盾——当前和为负就要果断放弃。
+<span class="tag">【解法】</span>集中优势兵力——Kadane 算法。遍历，curr_sum 加上当前值再与当前值比较取大，同时更新 max_sum。<span class="code-block">def max_subarray(nums):
+    curr = max_sum = nums[0]
+    for n in nums[1:]:
+        curr = max(n, curr + n)
+        max_sum = max(max_sum, curr)
+    return max_sum</span>
+<span class="tag">【检验】</span>全负[-3,-1,-2]→-1。单元素。O(n) O(1)。通过。`},
+
+  {title:"层序遍历二叉树",diff:"medium",icon:"🟡",q:"给定二叉树，返回层序遍历结果（逐层从左到右）",
+   a:`<span class="tag">【调查】</span>输入二叉树根节点。输出二维数组，每层一个列表。约束：树可能为空。
+<span class="tag">【主要矛盾】</span>深度优先递归天然按深不是按层——DFS 和层次访问之间的矛盾。要用宽度优先(BFS)。
+<span class="tag">【解法】</span>队列每轮处理一层：记录队列长度，弹出该层所有节点加入结果。<span class="code-block">from collections import deque
+def level_order(root):
+    if not root: return []
+    q = deque([root])
+    res = []
+    while q:
+        level = []
+        for _ in range(len(q)):
+            n = q.popleft()
+            level.append(n.val)
+            if n.left: q.append(n.left)
+            if n.right: q.append(n.right)
+        res.append(level)
+    return res</span>
+<span class="tag">【检验】</span>空树、单节点、完全二叉树。O(n) O(n)。通过。`},
+
+  {title:"零钱兑换",diff:"medium",icon:"🟡",q:"给定不同面额硬币和总金额，计算最少硬币数，不能凑出返回-1",
+   a:`<span class="tag">【调查】</span>输入硬币面额数组 coins，总金额 amount。输出最少硬币数或 -1。约束：硬币可无限用。
+<span class="tag">【主要矛盾】</span>贪心不一定最优（如 coins=[1,3,4], amount=6，贪心 4+1+1=3 枚，实际 3+3=2 枚）。局部最优与全局最优之间的矛盾——必须考虑所有可能的组合。
+<span class="tag">【解法】</span>星星之火——DP。dp[i] = min 硬币数凑成金额 i。dp[i] = min(dp[i-c]+1) for c in coins。<span class="code-block">def coin_change(coins, amount):
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0
+    for c in coins:
+        for i in range(c, amount + 1):
+            dp[i] = min(dp[i], dp[i - c] + 1)
+    return dp[amount] if dp[amount] != float('inf') else -1</span>
+<span class="tag">【检验】</span>amount=0、无法凑出、大数。O(n*amount) O(amount)。通过。`},
+
+  {title:"合并区间",diff:"medium",icon:"🟡",q:"给定一些区间，合并所有重叠的区间",
+   a:`<span class="tag">【调查】</span>输入区间列表 intervals。输出去重叠后的新区间列表。约束：区间已给但可能乱序。
+<span class="tag">【主要矛盾】</span>区间可能乱序——需要先排序。排序后任何重叠区间必然相邻，只需比较相邻区间的起止点。
+<span class="tag">【解法】</span>按起点排序后遍历。当前区间起点 ≤ 前面终点就是重叠，合并；否则新开一个。<span class="code-block">def merge(intervals):
+    intervals.sort(key=lambda x: x[0])
+    res = [intervals[0]]
+    for s, e in intervals[1:]:
+        if s <= res[-1][1]:
+            res[-1][1] = max(res[-1][1], e)
+        else:
+            res.append([s, e])
+    return res</span>
+<span class="tag">【检验】</span>无重叠、全部重叠、空输入。O(n log n) O(n)。通过。`},
+
+  {title:"最长回文子串",diff:"medium",icon:"🟡",q:"找出字符串中最长的回文子串",
+   a:`<span class="tag">【调查】</span>输入字符串 s。输出最长的回文子串。约束：s 长度可能很大。
+<span class="tag">【主要矛盾】</span>判断回文的 O(n²) 子串数 × O(n) 验证 = O(n³)。矛盾在于重复判断子串是否为回文——需要利用已判断的结果。
+<span class="tag">【解法】</span>集中优势兵力——中心扩展。每个字符（和每对相邻字符）向左右扩展，O(n²)。<span class="code-block">def longest_palindrome(s):
+    res = ''
+    for i in range(len(s)):
+        odd = expand(s, i, i)
+        even = expand(s, i, i + 1)
+        res = max(res, odd, even, key=len)
+    return res
+def expand(s, l, r):
+    while l >= 0 and r < len(s) and s[l] == s[r]:
+        l -= 1; r += 1
+    return s[l+1:r]</span>
+<span class="tag">【检验】</span>空串、单字符、全相同、bb vs bab。O(n²) O(1)。通过。`},
+
+  {title:"LRU 缓存",diff:"medium",icon:"🟡",q:"设计一个 LRU 缓存，支持 get(key) 和 put(key,value)，达到容量上限时淘汰最久未用",
+   a:`<span class="tag">【调查】</span>输入操作序列。输出每次 get 的值。约束：get/put 必须 O(1)，容量上限后淘汰。
+<span class="tag">【主要矛盾】</span>哈希表 O(1) 查值，但 O(n) 找最久未用。需要把这两个能力合在一起——哈希表 + 双向链表。
+<span class="tag">【解法】</span>哈希表存 key→节点地址，双向链表维护访问顺序。每次访问移到链表头，淘汰时删链表尾。<span class="code-block">class Node:
+    def __init__(self, k, v):
+        self.k = k; self.v = v
+        self.prev = self.next = None
+
+class LRUCache:
+    def __init__(self, cap):
+        self.cap = cap
+        self.cache = {}
+        self.head = Node(0, 0)
+        self.tail = Node(0, 0)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+    
+    def _remove(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+    
+    def _add(self, node):
+        node.next = self.head.next
+        node.prev = self.head
+        self.head.next.prev = node
+        self.head.next = node
+    
+    def get(self, key):
+        if key in self.cache:
+            node = self.cache[key]
+            self._remove(node)
+            self._add(node)
+            return node.v
+        return -1
+    
+    def put(self, key, value):
+        if key in self.cache:
+            self._remove(self.cache[key])
+        node = Node(key, value)
+        self._add(node)
+        self.cache[key] = node
+        if len(self.cache) > self.cap:
+            lru = self.tail.prev
+            self._remove(lru)
+            del self.cache[lru.k]</span>
+<span class="tag">【检验】</span>容量1反复put、get不存在key。O(1)。通过。`},
+
+  {title:"接雨水",diff:"hard",icon:"🔴",q:"给定柱状图高度数组，计算能接多少雨水",
+   a:`<span class="tag">【调查】</span>输入高度数组 height。输出能接的雨水总量。约束：柱子宽度为1。
+<span class="tag">【主要矛盾】</span>每个位置能接多少水，取决于左右两边最高柱子的较小值。暴力 O(n²)——每个位置都向左向右扫描。
+<span class="tag">【解法】</span>集中优势兵力——双指针。左指针指向左最高，右指针指向右最高。哪边矮就处理哪边：矮的那边决定了当前位置的积水上限。<span class="code-block">def trap(height):
+    l, r = 0, len(height) - 1
+    l_max = r_max = water = 0
+    while l < r:
+        if height[l] < height[r]:
+            if height[l] >= l_max:
+                l_max = height[l]
+            else:
+                water += l_max - height[l]
+            l += 1
+        else:
+            if height[r] >= r_max:
+                r_max = height[r]
+            else:
+                water += r_max - height[r]
+            r -= 1
+    return water</span>
+<span class="tag">【检验】</span>空数组、递增、递减、凹槽。O(n) O(1)。通过。`}
+];
+
+const qaGrid = document.getElementById('qaGrid');
+const answerPanel = document.getElementById('answerPanel');
+const answerTitle = document.getElementById('answerTitle');
+const answerBody = document.getElementById('answerBody');
+const answerIcon = document.getElementById('answerIcon');
+
+let activeIdx = -1;
+
+QA_DATA.forEach(function(item, i) {
+    var btn = document.createElement('button');
+    btn.className = 'qa-btn';
+    var diffClass = item.diff === 'easy' ? 'diff-easy' : item.diff === 'medium' ? 'diff-medium' : 'diff-hard';
+    var diffText = item.diff === 'easy' ? '简单' : item.diff === 'medium' ? '中等' : '困难';
+    btn.innerHTML = '<span class="idx">' + item.icon + '</span>' + item.q.substring(0, 55) + (item.q.length > 55 ? '…' : '') + '<span class="difficulty ' + diffClass + '">' + diffText + '</span>';
+    btn.title = item.q;
+    btn.addEventListener('click', function() {
+        if (activeIdx === i) {
+            answerPanel.classList.remove('active');
+            activeIdx = -1;
+            return;
+        }
+        answerIcon.textContent = item.icon;
+        answerTitle.textContent = item.title;
+        answerBody.innerHTML = item.a;
+        answerPanel.classList.add('active');
+        answerPanel.scrollIntoView({behavior: 'smooth', block: 'start'});
+        activeIdx = i;
+    });
+    qaGrid.appendChild(btn);
+});
+</script>
+</body>
+</html>
