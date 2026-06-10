@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>红宝书 · 对话</title>
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #161616;
+  --bg-tertiary: #1e1e1e;
+  --bg-input: #242424;
+  --border: #2a2a2a;
+  --text-primary: #e8e6e3;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6b6b6b;
+  --red: #c41e3a;
+  --red-hover: #e02344;
+  --red-glow: rgba(196, 30, 58, 0.3);
+  --red-bg: rgba(196, 30, 58, 0.08);
+  --green: #4caf50;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --transition: 180ms ease;
+  --font-mono: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  animation: fadeDown 0.5s ease;
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo {
+  width: 36px;
+  height: 36px;
+  background: var(--red);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.header-text h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.header-text p {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 7px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: #3a3a3a;
+}
+
+.btn-red {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+.btn-red:hover {
+  background: var(--red-hover);
+  box-shadow: 0 0 14px var(--red-glow);
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scroll-behavior: smooth;
+}
+
+.chat-area::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+.chat-area::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.welcome-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--red);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 16px;
+  box-shadow: 0 0 30px var(--red-glow);
+}
+
+.welcome h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.welcome .subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+.welcome-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 480px;
+}
+
+.suggestion-chip {
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.suggestion-chip:hover {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red-hover);
+}
+
+.message {
+  display: flex;
+  margin-bottom: 20px;
+  animation: msgIn 0.35s ease;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.assistant {
+  justify-content: flex-start;
+}
+
+.msg-wrapper {
+  max-width: 78%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message.user .msg-wrapper {
+  align-items: flex-end;
+}
+
+.msg-avatar-name {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.message.user .msg-avatar-name {
+  color: var(--text-muted);
+}
+
+.message.assistant .msg-avatar-name {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.msg-bubble {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.message.user .msg-bubble {
+  background: var(--red);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.message.assistant .msg-bubble {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.msg-bubble pre {
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin: 10px 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.msg-bubble code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.msg-bubble pre code {
+  background: none;
+  padding: 0;
+}
+
+.message.user .msg-bubble pre {
+  background: rgba(0,0,0,0.25);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.msg-bubble p {
+  margin-bottom: 6px;
+}
+
+.msg-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+  margin-bottom: 20px;
+  animation: msgIn 0.3s ease;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingBounce 1.2s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.error-msg {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 20px;
+  animation: msgIn 0.3s ease;
+}
+
+.input-area {
+  padding: 14px 20px 18px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  transition: border-color var(--transition);
+}
+
+.input-row:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+
+.input-row textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  min-height: 24px;
+  max-height: 140px;
+  padding: 4px 0;
+}
+
+.input-row textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.send-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.send-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition);
+}
+
+.send-btn:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  box-shadow: 0 0 12px var(--red-glow);
+}
+
+.send-btn:hover svg {
+  transform: translateX(1px);
+}
+
+.send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.send-btn:disabled:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.input-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 6px;
+  padding-right: 4px;
+}
+
+/* Settings Panel */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.25s ease;
+}
+
+.settings-overlay.open {
+  display: flex;
+}
+
+.settings-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 420px;
+  max-width: 92vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.settings-panel h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.settings-panel .panel-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px var(--red-glow);
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b6b' stroke-width='2'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.form-group select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.settings-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.settings-actions .btn {
+  flex: 1;
+  justify-content: center;
+  padding: 10px 16px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 13px;
+  z-index: 200;
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  padding: 10px 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+footer a {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+  letter-spacing: 0.3px;
+}
+
+footer a:hover {
+  color: var(--red-hover);
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  header {
+    padding: 10px 14px;
+  }
+
+  .header-logo {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+    border-radius: 6px;
+  }
+
+  .header-text h1 {
+    font-size: 14px;
+  }
+
+  .header-text p {
+    font-size: 11px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .chat-area {
+    padding: 14px;
+  }
+
+  .msg-wrapper {
+    max-width: 88%;
+  }
+
+  .input-area {
+    padding: 10px 14px 14px;
+  }
+
+  .settings-panel {
+    padding: 20px;
+  }
+
+  .welcome h2 {
+    font-size: 20px;
+  }
+
+  .welcome-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="header-logo">红</div>
+    <div class="header-text">
+      <h1>红宝书 · 对话</h1>
+      <p>用毛主席思想分析算法问题</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="copyPrompt()" title="复制系统提示词">📋 复制提示词</button>
+    <button class="btn btn-ghost" onclick="clearChat()">🗑 清空对话</button>
+    <button class="btn btn-ghost" onclick="openSettings()">⚙️ 设置</button>
+  </div>
+</header>
+
+<main>
+  <div class="chat-area" id="chatArea">
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">红</div>
+      <h2>红宝书 · 对话</h2>
+      <p class="subtitle">用毛主席《矛盾论》《实践论》为方法论分析算法问题</p>
+      <div class="welcome-suggestions">
+        <span class="suggestion-chip" onclick="useSuggestion(this)">分析"两数之和"</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">我没思路：判断重复元素</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">什么是持久战？与算法何干？</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">诊断代码（贴代码即可）</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">出一道中等难度题</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">讲讲动态规划的矛盾本质</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-row">
+      <textarea id="msgInput" rows="1" placeholder="输入算法问题，或说「没思路」…" onkeydown="handleKeydown(event)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="发送 (Enter)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+    <div class="input-hint">Enter 发送 · Shift+Enter 换行</div>
+  </div>
+</main>
+
+<footer>
+  <a href="https://github.com/LLyhy/redbook" target="_blank" rel="noopener">红宝书 · 公开版 · GitHub</a>
+</footer>
+
+<!-- Settings Overlay -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-panel">
+    <h3>⚙️ API 设置</h3>
+    <p class="panel-desc">配置 DeepSeek API 后即可使用。密钥仅保存在浏览器本地。</p>
+    <div class="form-group">
+      <label for="apiKey">API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="apiEndpoint">API 端点</label>
+      <input type="url" id="apiEndpoint" placeholder="https://api.deepseek.com/chat/completions">
+    </div>
+    <div class="form-group">
+      <label for="modelSelect">模型</label>
+      <select id="modelSelect">
+        <option value="deepseek-chat">deepseek-chat</option>
+        <option value="deepseek-reasoner">deepseek-reasoner</option>
+      </select>
+    </div>
+    <div class="settings-actions">
+      <button class="btn btn-ghost" onclick="closeSettings()">取消</button>
+      <button class="btn btn-red" onclick="saveSettings()">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const REDBOOK_SYSTEM_PROMPT = '你是"红宝书"，以毛主席《矛盾论》《实践论》为方法论分析算法问题。核心人格：任何算法问题本质是矛盾（已知vs所求），先找主要矛盾再选解法，语录必须对应具体算法，简洁务实不搞形式主义。解题格式：【调查】输入/输出/约束→【主要矛盾】一句话→【解法】逻辑推导→【代码】→【检验】边界/复杂度。用户说"没思路"：只做调查不给答案，禁止提任何算法名称，引导用户自己发现矛盾。诊断代码：逻辑→边界→工具→效率，一次只诊断一层。哲学概念用【原文】【含义】【算法启示】三层格式。语录映射：集中优势兵力→二分/双指针，星星之火→DP，敌进我退→回溯，群众路线→哈希表，没有调查就没有发言权→审题/调试。禁止：堆砌语录、形式主义、替用户思考、一次性输出全部、反问用户。';
+
+const chatArea = document.getElementById('chatArea');
+const msgInput = document.getElementById('msgInput');
+const sendBtn = document.getElementById('sendBtn');
+const welcome = document.getElementById('welcome');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const toast = document.getElementById('toast');
+
+let conversationHistory = [];
+let isLoading = false;
+
+function getSettings() {
+  return {
+    apiKey: localStorage.getItem('redbook_api_key') || '',
+    apiEndpoint: localStorage.getItem('redbook_api_endpoint') || 'https://api.deepseek.com/chat/completions',
+    model: localStorage.getItem('redbook_model') || 'deepseek-chat'
+  };
+}
+
+function saveSettingsToStorage(key, endpoint, model) {
+  localStorage.setItem('redbook_api_key', key);
+  localStorage.setItem('redbook_api_endpoint', endpoint);
+  localStorage.setItem('redbook_model', model);
+}
+
+(function init() {
+  const s = getSettings();
+  document.getElementById('apiKey').value = s.apiKey;
+  document.getElementById('apiEndpoint').value = s.apiEndpoint;
+  document.getElementById('modelSelect').value = s.model;
+})();
+
+function openSettings() {
+  const s = getSettings();
+  document.getElementById('apiKey').value = s.apiKey;
+  document.getElementById('apiEndpoint').value = s.apiEndpoint;
+  document.getElementById('modelSelect').value = s.model;
+  settingsOverlay.classList.add('open');
+}
+
+function closeSettings() {
+  settingsOverlay.classList.remove('open');
+}
+
+function saveSettings() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const apiEndpoint = document.getElementById('apiEndpoint').value.trim();
+  const model = document.getElementById('modelSelect').value;
+  saveSettingsToStorage(apiKey, apiEndpoint, model);
+  settingsOverlay.classList.remove('open');
+  showToast('✅ 设置已保存');
+}
+
+settingsOverlay.addEventListener('click', function(e) {
+  if (e.target === settingsOverlay) closeSettings();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSettings();
+});
+
+function showToast(text) {
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 2200);
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(REDBOOK_SYSTEM_PROMPT).then(function() {
+    showToast('✅ 系统提示词已复制到剪贴板');
+  }).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = REDBOOK_SYSTEM_PROMPT;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ 系统提示词已复制到剪贴板');
+  });
+}
+
+function clearChat() {
+  conversationHistory = [];
+  while (chatArea.lastChild) {
+    if (chatArea.lastChild === welcome) break;
+    chatArea.removeChild(chatArea.lastChild);
+  }
+  welcome.style.display = 'flex';
+  scrollToBottom();
+}
+
+function useSuggestion(el) {
+  var text = el.textContent.trim();
+  msgInput.value = text;
+  sendMessage();
+  msgInput.style.height = 'auto';
+}
+
+function handleKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+msgInput.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+});
+
+function sendMessage() {
+  var text = msgInput.value.trim();
+  if (!text || isLoading) return;
+
+  var s = getSettings();
+  if (!s.apiKey) {
+    openSettings();
+    showToast('⚠️ 请先配置 API Key');
+    return;
+  }
+
+  if (welcome.style.display !== 'none') {
+    welcome.style.display = 'none';
+  }
+
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+
+  msgInput.value = '';
+  msgInput.style.height = 'auto';
+
+  var typingEl = addTypingIndicator();
+  isLoading = true;
+  sendBtn.disabled = true;
+
+  var payload = {
+    model: s.model,
+    messages: [
+      { role: 'system', content: REDBOOK_SYSTEM_PROMPT }
+    ].concat(conversationHistory),
+    max_tokens: 1500,
+    temperature: 0.7,
+    stream: false
+  };
+
+  fetch(s.apiEndpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + s.apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(function(res) {
+    if (!res.ok) {
+      return res.json().then(function(err) {
+        throw new Error(err.error ? err.error.message : ('HTTP ' + res.status + ' ' + res.statusText));
+      });
+    }
+    return res.json();
+  })
+  .then(function(data) {
+    removeTypingIndicator(typingEl);
+    var reply = data.choices && data.choices[0] && data.choices[0].message
+      ? data.choices[0].message.content
+      : '（空响应）';
+    addMessage('assistant', reply);
+    conversationHistory.push({ role: 'assistant', content: reply });
+  })
+  .catch(function(err) {
+    removeTypingIndicator(typingEl);
+    var errMsg = err.message || '请求失败，请检查网络或 API 配置';
+    addError(errMsg);
+    conversationHistory.push({ role: 'assistant', content: '[错误] ' + errMsg });
+  })
+  .finally(function() {
+    isLoading = false;
+    sendBtn.disabled = false;
+    msgInput.focus();
+  });
+}
+
+function addMessage(role, content) {
+  var wrapper = document.createElement('div');
+  wrapper.className = 'message ' + role;
+
+  var inner = document.createElement('div');
+  inner.className = 'msg-wrapper';
+
+  var nameEl = document.createElement('div');
+  nameEl.className = 'msg-avatar-name';
+  nameEl.textContent = role === 'user' ? '你' : '红宝书';
+
+  var bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = role === 'assistant' ? renderMarkdown(content) : escapeHtml(content);
+
+  inner.appendChild(nameEl);
+  inner.appendChild(bubble);
+  wrapper.appendChild(inner);
+  chatArea.appendChild(wrapper);
+  scrollToBottom();
+}
+
+function addTypingIndicator() {
+  var el = document.createElement('div');
+  el.className = 'typing-indicator';
+  el.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  chatArea.appendChild(el);
+  scrollToBottom();
+  return el;
+}
+
+function removeTypingIndicator(el) {
+  if (el && el.parentNode) {
+    el.parentNode.removeChild(el);
+  }
+}
+
+function addError(msg) {
+  var el = document.createElement('div');
+  el.className = 'error-msg';
+  el.textContent = '❌ ' + msg;
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
+
+function renderMarkdown(text) {
+  var escaped = escapeHtml(text);
+
+  escaped = escaped.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
+    return '<pre><code>' + code.trim() + '</code></pre>';
+  });
+
+  return escaped;
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+function scrollToBottom() {
+  requestAnimationFrame(function() {
+    chatArea.scrollTop = chatArea.scrollHeight;
+  });
+}
+</script>
+</body>
+</html>
