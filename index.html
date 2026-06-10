@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>红宝书 · 用矛盾论分析算法</title>
+<style>
+:root{--bg:#0d0d0d;--card:#161616;--red:#c41e3a;--text:#e8e6e3;--muted:#a0a0a0;--border:#2a2a2a}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.container{max-width:900px;margin:0 auto;padding:40px 20px}
+.hero{text-align:center;padding:60px 0 40px}
+.hero h1{font-size:3em;font-weight:800;letter-spacing:-1px}
+.hero h1 .red{color:var(--red)}
+.hero p{margin-top:16px;color:var(--muted);font-size:1.15em;max-width:600px;margin-left:auto;margin-right:auto}
+.hero .cta{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{padding:12px 28px;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all 180ms ease;border:none}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:#e02344;transform:translateY(-1px);box-shadow:0 8px 24px rgba(196,30,58,.3)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--red);color:var(--red)}
+.demo-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin:32px 0;font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:0.88em;line-height:1.9;position:relative}
+.demo-box .role{color:var(--red);font-weight:600;font-size:0.78em;letter-spacing:1px}
+.demo-box .user{color:#6b9fff;font-weight:600;font-size:0.78em;letter-spacing:1px}
+.demo-box .typing{display:inline-block;width:8px;height:16px;background:var(--text);animation:blink .8s infinite;vertical-align:middle;margin-left:4px}
+@keyframes blink{50%{opacity:0}}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:40px 0}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;transition:transform 150ms ease}
+.feature-card:hover{transform:translateY(-2px);border-color:var(--red)}
+.feature-card .icon{font-size:1.6em;margin-bottom:12px}
+.feature-card h3{font-size:1.05em;margin-bottom:8px}
+.feature-card p{color:var(--muted);font-size:0.9em}
+.section-title{font-size:1.5em;font-weight:700;margin:48px 0 20px}
+.quote-table{width:100%;border-collapse:collapse;font-size:0.92em}
+.quote-table td,.quote-table th{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.quote-table th{color:var(--muted);font-weight:500;font-size:0.82em;letter-spacing:0.5px}
+footer{text-align:center;color:var(--muted);padding:40px 0;font-size:0.85em;border-top:1px solid var(--border);margin-top:60px}
+footer a{color:var(--red);text-decoration:none}
+@media(max-width:640px){.hero h1{font-size:2em}.hero{padding:30px 0 20px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <h1><span class="red">红</span>宝书</h1>
+  <p>用毛主席《矛盾论》《实践论》分析算法问题<br>复制提示词，任何 AI 都能变成红宝书人格</p>
+  <div class="cta">
+    <a href="chat/" class="btn btn-primary">🚀 立即体验</a>
+    <a href="https://github.com/LLyhy/redbook" class="btn btn-outline">⭐ GitHub</a>
+  </div>
+</div>
+
+<div class="demo-box">
+  <div class="user">👤 你</div>
+  分析一下两数之和<br><br>
+  <div class="role">🧠 红宝书</div>
+  【调查】输入整数数组 nums，目标 target。输出两个下标使和=target。<br>
+  【主要矛盾】暴力 O(n²) 枚举每对组合，查找补数太慢。<br>
+  【解法】哈希表——群众路线。遍历时查 target-num 见过没。O(n)。<br>
+  【检验】O(n)/O(n)，通过。<span class="typing"></span>
+</div>
+
+<div class="section-title">📦 项目包含</div>
+<div class="features">
+  <div class="feature-card">
+    <div class="icon">🧠</div>
+    <h3>300-token 系统提示词</h3>
+    <p>实测 100% 命中率，复制粘贴到任何 AI 即用</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon">📊</div>
+    <h3>500 条微调数据</h3>
+    <p>覆盖 LeetCode Top 200+，直接上传微调</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon">💬</div>
+    <h3>在线聊天页面</h3>
+    <p>单页 HTML，填入 API Key 即可对话</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon">📖</div>
+    <h3>电子书</h3>
+    <p>矛盾分析法 + 数据结构 + 算法的完整教程</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon">🔌</div>
+    <h3>LeetCode 插件</h3>
+    <p>侧栏自动分析题目，引导/分析双模式</p>
+  </div>
+  <div class="feature-card">
+    <div class="icon">🤖</div>
+    <h3>Discord Bot</h3>
+    <p>群里 @红宝书 即问即答</p>
+  </div>
+</div>
+
+<div class="section-title">🗣 语录 → 算法</div>
+<table class="quote-table">
+  <tr><th>毛主席语录</th><th>算法思想</th></tr>
+  <tr><td>"集中优势兵力，各个击破"</td><td>二分查找、双指针</td></tr>
+  <tr><td>"星星之火，可以燎原"</td><td>动态规划</td></tr>
+  <tr><td>"敌进我退，敌退我进"</td><td>回溯算法</td></tr>
+  <tr><td>"人民群众是历史的创造者"</td><td>哈希表</td></tr>
+  <tr><td>"牵一发而动全身"</td><td>链表操作</td></tr>
+  <tr><td>"没有调查就没有发言权"</td><td>审题、调试</td></tr>
+</table>
+
+</div>
+
+<footer>
+  <a href="https://github.com/LLyhy/redbook">LLyhy/redbook</a> · 开源 · MIT
+</footer>
+</body>
+</html>
