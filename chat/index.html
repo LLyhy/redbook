@@ -109,6 +109,30 @@ header {
 .header-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.mode-toggle {
+  display: flex;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.mode-toggle button {
+  padding: 5px 10px;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+.mode-toggle button.active {
+  background: var(--red);
+  color: #fff;
 }
 
 .btn {
@@ -705,6 +729,10 @@ footer a:hover {
     </div>
   </div>
   <div class="header-actions">
+    <div class="mode-toggle" id="modeToggle">
+      <button id="modeBtnAgent" onclick="switchMode('agent')">Agent</button>
+      <button id="modeBtnAlgo" onclick="switchMode('algorithm')">算法</button>
+    </div>
     <button class="btn btn-ghost" onclick="copyPrompt()" title="复制系统提示词">📋 复制提示词</button>
     <button class="btn btn-ghost" onclick="clearChat()">🗑 清空对话</button>
     <button class="btn btn-ghost" onclick="openSettings()">⚙️ 设置</button>
@@ -717,7 +745,15 @@ footer a:hover {
       <div class="welcome-icon">红</div>
       <h2>红宝书 · 对话</h2>
       <p class="subtitle">用毛主席《矛盾论》《实践论》为方法论分析算法问题</p>
-      <div class="welcome-suggestions">
+      <div class="welcome-suggestions" id="suggestAgent">
+        <span class="suggestion-chip" onclick="useSuggestion(this)">分析一下两数之和</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">设计一个短链接系统，日均1亿访问</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">我写的代码很慢怎么排查</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">前端用React还是Vue？团队5人</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">制定一个30天Python学习计划</span>
+        <span class="suggestion-chip" onclick="useSuggestion(this)">讲讲矛盾论对工程决策的启示</span>
+      </div>
+      <div class="welcome-suggestions" id="suggestAlgo" style="display:none">
         <span class="suggestion-chip" onclick="useSuggestion(this)">分析"两数之和"</span>
         <span class="suggestion-chip" onclick="useSuggestion(this)">我没思路：判断重复元素</span>
         <span class="suggestion-chip" onclick="useSuggestion(this)">什么是持久战？与算法何干？</span>
@@ -776,7 +812,11 @@ footer a:hover {
 <div class="toast" id="toast"></div>
 
 <script>
-const REDBOOK_SYSTEM_PROMPT = '你是"红宝书"，以毛主席《矛盾论》《实践论》为方法论分析算法问题。核心人格：任何算法问题本质是矛盾（已知vs所求），先找主要矛盾再选解法，语录必须对应具体算法，简洁务实不搞形式主义。解题格式：【调查】输入/输出/约束→【主要矛盾】一句话→【解法】逻辑推导→【代码】→【检验】边界/复杂度。用户说"没思路"：只做调查不给答案，禁止提任何算法名称，引导用户自己发现矛盾。诊断代码：逻辑→边界→工具→效率，一次只诊断一层。哲学概念用【原文】【含义】【算法启示】三层格式。语录映射：集中优势兵力→二分/双指针，星星之火→DP，敌进我退→回溯，群众路线→哈希表，没有调查就没有发言权→审题/调试。禁止：堆砌语录、形式主义、替用户思考、一次性输出全部、反问用户。';
+var REDBOOK_SYSTEM_PROMPT = '你是"红宝书"，以毛主席《矛盾论》《实践论》为方法论分析算法问题。核心人格：任何算法问题本质是矛盾（已知vs所求），先找主要矛盾再选解法，语录必须对应具体算法，简洁务实不搞形式主义。解题格式：【调查】输入/输出/约束→【主要矛盾】一句话→【解法】逻辑推导→【代码】→【检验】边界/复杂度。用户说"没思路"：只做调查不给答案，禁止提任何算法名称，引导用户自己发现矛盾。诊断代码：逻辑→边界→工具→效率，一次只诊断一层。哲学概念用【原文】【含义】【算法启示】三层格式。语录映射：集中优势兵力→二分/双指针，星星之火→DP，敌进我退→回溯，群众路线→哈希表，没有调查就没有发言权→审题/调试。禁止：堆砌语录、形式主义、替用户思考、一次性输出全部、反问用户。';
+
+var AGENT_PROMPT = '你是红宝书。用矛盾分析法解决一切问题。实事求是，具体问题具体分析。===Agent思维循环===每次回答前自问:1.问题域判定 2.矛盾定位 3.是否需要追问 4.推理求解 5.格式化输出 6.复盘自检。===问题域与格式===算法→【调查】【主要矛盾】【解法】【代码】【检验】系统设计→【调查】规模/约束【主要矛盾】扩展瓶颈【方案】【权衡】【检验】调试→【调查】现象【主要矛盾】逻辑错/边界漏(一次一层)【根因】【修复】【检验】架构→【调查】现状/目标【主要矛盾】选型冲突【方案对比】【推荐】【检验】学习方法→【调查】目标/现状【主要矛盾】速成vs深度【计划】持久战【检验】通用→【调查】【主要矛盾】对立面是什么【分析】【建议】【检验】。语录:集中优势兵力→聚焦核心 星星之火→积累效应 敌进我退→迂回策略 群众路线→利用现有资源 没有调查就没有发言权→先调研再动手 实事求是→不套模板 持久战→分解长期目标。最高优先级:用户说没思路→只做调查+引导,不提答案。自检:域匹配?格式全?没思路没漏答?语录对应?逻辑闭环?';
+
+var chatMode = localStorage.getItem('redbook_chat_mode') || 'agent';
 
 const chatArea = document.getElementById('chatArea');
 const msgInput = document.getElementById('msgInput');
@@ -848,20 +888,41 @@ function showToast(text) {
 }
 
 function copyPrompt() {
-  navigator.clipboard.writeText(REDBOOK_SYSTEM_PROMPT).then(function() {
-    showToast('✅ 系统提示词已复制到剪贴板');
-  }).catch(function() {
+  navigator.clipboard.writeText(getSystemPrompt()).then(function() {
+    showToast('✅ 提示词已复制');
+  }, function() {
     var ta = document.createElement('textarea');
-    ta.value = REDBOOK_SYSTEM_PROMPT;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
+    ta.value = getSystemPrompt();
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    showToast('✅ 系统提示词已复制到剪贴板');
+    showToast('✅ 提示词已复制');
   });
 }
+
+function switchMode(mode) {
+  chatMode = mode;
+  localStorage.setItem('redbook_chat_mode', mode);
+  document.getElementById('modeBtnAgent').classList.toggle('active', mode === 'agent');
+  document.getElementById('modeBtnAlgo').classList.toggle('active', mode === 'algorithm');
+  document.getElementById('suggestAgent').style.display = mode === 'agent' ? '' : 'none';
+  document.getElementById('suggestAlgo').style.display = mode === 'algorithm' ? '' : 'none';
+  var headerP = document.querySelector('.header-text p');
+  if (mode === 'agent') {
+    headerP.textContent = '用矛盾分析法解决一切问题';
+  } else {
+    headerP.textContent = '用毛主席思想分析算法问题';
+  }
+}
+
+function getSystemPrompt() {
+  return chatMode === 'agent' ? AGENT_PROMPT : REDBOOK_SYSTEM_PROMPT;
+}
+
+(function initMode() {
+  switchMode(chatMode);
+})();
 
 function clearChat() {
   conversationHistory = [];
@@ -920,7 +981,7 @@ function sendMessage() {
   var payload = {
     model: s.model,
     messages: [
-      { role: 'system', content: REDBOOK_SYSTEM_PROMPT }
+      { role: 'system', content: getSystemPrompt() }
     ].concat(conversationHistory),
     max_tokens: 1500,
     temperature: 0.7,
