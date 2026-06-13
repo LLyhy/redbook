@@ -792,7 +792,8 @@ footer a:hover {
       <select id="providerSelect" onchange="onProviderChange()">
         <option value="deepseek">DeepSeek</option>
         <option value="openai">OpenAI</option>
-        <option value="ollama">本地红宝书 (Ollama)</option>
+        <option value="local-server">本地服务器 (Python)</option>
+        <option value="ollama">本地模型 (Ollama)</option>
       </select>
     </div>
     <div id="settingsApiSection">
@@ -815,11 +816,7 @@ footer a:hover {
     </div>
     </div>
     <div id="settingsOllamaInfo" style="display:none">
-      <p style="color:var(--green);font-size:0.85em;padding:8px 0">
-        ✅ 使用本地红宝书模型<br>
-        需要先运行 <b>local-model/setup.ps1</b> 安装<br>
-        Ollama 默认地址: http://localhost:11434
-      </p>
+      <p style="color:var(--green);font-size:0.85em;padding:8px 0" id="settingsInfoText"></p>
     </div>
     <div class="settings-actions">
       <button class="btn btn-ghost" onclick="closeSettings()">取消</button>
@@ -874,9 +871,14 @@ function saveSettingsToStorage(key, endpoint, model, provider) {
 
 function onProviderChange() {
   var p = document.getElementById('providerSelect').value;
-  if (p === 'ollama') {
+  if (p === 'ollama' || p === 'local-server') {
     document.getElementById('settingsApiSection').style.display = 'none';
     document.getElementById('settingsOllamaInfo').style.display = '';
+    if (p === 'local-server') {
+      document.getElementById('settingsInfoText').innerHTML = '✅ 本地 Python 服务器<br>运行 <b>python local-model/server.py</b><br>地址: http://localhost:8787';
+    } else {
+      document.getElementById('settingsInfoText').innerHTML = '✅ 本地 Ollama 模型<br>运行 <b>local-model/setup.ps1</b><br>地址: http://localhost:11434';
+    }
   } else {
     document.getElementById('settingsApiSection').style.display = '';
     document.getElementById('settingsOllamaInfo').style.display = 'none';
@@ -1026,13 +1028,14 @@ function sendMessage() {
     { role: 'system', content: getSystemPrompt() }
   ].concat(conversationHistory);
 
-  if (s.provider === 'ollama') {
+  if (s.provider === 'ollama' || s.provider === 'local-server') {
     var ollamaPayload = {
       model: 'redbook',
       messages: messages,
       stream: false
     };
-    fetch('http://localhost:11434/api/chat', {
+    var localUrl = s.provider === 'local-server' ? 'http://localhost:8787/v1/chat/completions' : 'http://localhost:11434/api/chat';
+    fetch(localUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(ollamaPayload)
