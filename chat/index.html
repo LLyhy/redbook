@@ -785,8 +785,17 @@ footer a:hover {
 <!-- Settings Overlay -->
 <div class="settings-overlay" id="settingsOverlay">
   <div class="settings-panel">
-    <h3>⚙️ API 设置</h3>
-    <p class="panel-desc">配置 DeepSeek API 后即可使用。密钥仅保存在浏览器本地。</p>
+    <h3>⚙️ 设置</h3>
+    <p class="panel-desc">选择 AI 提供商。密钥仅保存在浏览器本地。</p>
+    <div class="form-group">
+      <label for="providerSelect">提供商</label>
+      <select id="providerSelect" onchange="onProviderChange()">
+        <option value="deepseek">DeepSeek</option>
+        <option value="openai">OpenAI</option>
+        <option value="ollama">本地红宝书 (Ollama)</option>
+      </select>
+    </div>
+    <div id="settingsApiSection">
     <div class="form-group">
       <label for="apiKey">API Key</label>
       <input type="password" id="apiKey" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
@@ -800,7 +809,17 @@ footer a:hover {
       <select id="modelSelect">
         <option value="deepseek-chat">deepseek-chat</option>
         <option value="deepseek-reasoner">deepseek-reasoner</option>
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
       </select>
+    </div>
+    </div>
+    <div id="settingsOllamaInfo" style="display:none">
+      <p style="color:var(--green);font-size:0.85em;padding:8px 0">
+        ✅ 使用本地红宝书模型<br>
+        需要先运行 <b>local-model/setup.ps1</b> 安装<br>
+        Ollama 默认地址: http://localhost:11434
+      </p>
     </div>
     <div class="settings-actions">
       <button class="btn btn-ghost" onclick="closeSettings()">取消</button>
@@ -832,28 +851,52 @@ function getSettings() {
   return {
     apiKey: localStorage.getItem('redbook_api_key') || '',
     apiEndpoint: localStorage.getItem('redbook_api_endpoint') || 'https://api.deepseek.com/chat/completions',
-    model: localStorage.getItem('redbook_model') || 'deepseek-chat'
+    model: localStorage.getItem('redbook_model') || 'deepseek-chat',
+    provider: localStorage.getItem('redbook_provider') || 'deepseek'
   };
 }
 
-function saveSettingsToStorage(key, endpoint, model) {
+function saveSettingsToStorage(key, endpoint, model, provider) {
   localStorage.setItem('redbook_api_key', key);
   localStorage.setItem('redbook_api_endpoint', endpoint);
   localStorage.setItem('redbook_model', model);
+  localStorage.setItem('redbook_provider', provider || 'deepseek');
 }
 
 (function init() {
-  const s = getSettings();
+  var s = getSettings();
   document.getElementById('apiKey').value = s.apiKey;
   document.getElementById('apiEndpoint').value = s.apiEndpoint;
   document.getElementById('modelSelect').value = s.model;
+  document.getElementById('providerSelect').value = s.provider || 'deepseek';
+  onProviderChange();
 })();
 
+function onProviderChange() {
+  var p = document.getElementById('providerSelect').value;
+  if (p === 'ollama') {
+    document.getElementById('settingsApiSection').style.display = 'none';
+    document.getElementById('settingsOllamaInfo').style.display = '';
+  } else {
+    document.getElementById('settingsApiSection').style.display = '';
+    document.getElementById('settingsOllamaInfo').style.display = 'none';
+    if (p === 'openai') {
+      document.getElementById('apiEndpoint').value = 'https://api.openai.com/v1/chat/completions';
+      document.getElementById('modelSelect').value = 'gpt-4o-mini';
+    } else {
+      document.getElementById('apiEndpoint').value = 'https://api.deepseek.com/chat/completions';
+      document.getElementById('modelSelect').value = 'deepseek-chat';
+    }
+  }
+}
+
 function openSettings() {
-  const s = getSettings();
+  var s = getSettings();
   document.getElementById('apiKey').value = s.apiKey;
   document.getElementById('apiEndpoint').value = s.apiEndpoint;
   document.getElementById('modelSelect').value = s.model;
+  document.getElementById('providerSelect').value = s.provider || 'deepseek';
+  onProviderChange();
   settingsOverlay.classList.add('open');
 }
 
@@ -862,10 +905,11 @@ function closeSettings() {
 }
 
 function saveSettings() {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  const apiEndpoint = document.getElementById('apiEndpoint').value.trim();
-  const model = document.getElementById('modelSelect').value;
-  saveSettingsToStorage(apiKey, apiEndpoint, model);
+  var apiKey = document.getElementById('apiKey').value.trim();
+  var apiEndpoint = document.getElementById('apiEndpoint').value.trim();
+  var model = document.getElementById('modelSelect').value;
+  var provider = document.getElementById('providerSelect').value;
+  saveSettingsToStorage(apiKey, apiEndpoint, model, provider);
   settingsOverlay.classList.remove('open');
   showToast('✅ 设置已保存');
 }
@@ -958,9 +1002,9 @@ function sendMessage() {
   if (!text || isLoading) return;
 
   var s = getSettings();
-  if (!s.apiKey) {
+  if (s.provider !== 'ollama' && !s.apiKey) {
     openSettings();
-    showToast('⚠️ 请先配置 API Key');
+    showToast('⚠️ 请先配置 API Key 或选择本地模型');
     return;
   }
 
@@ -978,11 +1022,47 @@ function sendMessage() {
   isLoading = true;
   sendBtn.disabled = true;
 
+  var messages = [
+    { role: 'system', content: getSystemPrompt() }
+  ].concat(conversationHistory);
+
+  if (s.provider === 'ollama') {
+    var ollamaPayload = {
+      model: 'redbook',
+      messages: messages,
+      stream: false
+    };
+    fetch('http://localhost:11434/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ollamaPayload)
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Ollama 请求失败。确认已运行 setup.ps1 且 Ollama 正在运行');
+      return res.json();
+    })
+    .then(function(data) {
+      removeTypingIndicator(typingEl);
+      var reply = data.message ? data.message.content : '';
+      addMessage('assistant', reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+      scrollToBottom();
+      isLoading = false;
+      sendBtn.disabled = false;
+      msgInput.focus();
+    })
+    .catch(function(err) {
+      removeTypingIndicator(typingEl);
+      addMessage('assistant', '❌ 本地模型请求失败。\n请确认：\n1. Ollama 已安装并运行\n2. 已执行 local-model/setup.ps1\n3. 红宝书模型已创建\n\n错误：' + err.message);
+      isLoading = false;
+      sendBtn.disabled = false;
+    });
+    return;
+  }
+
   var payload = {
     model: s.model,
-    messages: [
-      { role: 'system', content: getSystemPrompt() }
-    ].concat(conversationHistory),
+    messages: messages,
     max_tokens: 1500,
     temperature: 0.7,
     stream: false
